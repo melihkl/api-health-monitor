@@ -10,7 +10,7 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 
-# YAML okuma ve yazma fonksiyonları
+# YAML reading and writing functions
 def read_yaml(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
@@ -21,7 +21,7 @@ def write_to_yaml(file_path, data):
         yaml.dump(data, file)
 
 
-# API health durumunu kontrol eden fonksiyon
+# Function that checks API health status
 def check_health(api):
     method = api.get('method', 'GET').upper()
     url = api['url']
@@ -50,7 +50,7 @@ def check_health(api):
         return f"{api['name']} health: DOWN (Error: {str(e)})"
 
 
-# Belirli aralıklarla API health durumunu kontrol eden fonksiyon
+# Function that checks API health status at regular intervals
 def check_apis_health_periodically(yaml_file, output_yaml):
     apis = read_yaml(yaml_file)['apis']
 
@@ -66,7 +66,7 @@ def check_apis_health_periodically(yaml_file, output_yaml):
     write_to_yaml(output_yaml, results)
 
 
-# API formdan alınan veriyi YAML dosyasına kaydeden fonksiyon
+# Function that saves the data received from the API form to the YAML file
 def save_to_yaml(api_data, file_path='apis.yaml'):
     try:
         with open(file_path, 'r') as file:
@@ -80,13 +80,13 @@ def save_to_yaml(api_data, file_path='apis.yaml'):
         yaml.safe_dump(current_data, file)
 
 
-# Anasayfa formunu gösteren rota
+# Show homepage form
 @app.get("/", response_class=HTMLResponse)
 async def form_view(request: Request):
     return templates.TemplateResponse("form.html", {"request": request})
 
 
-# Formdan gelen veriyi işleyip YAML dosyasına kaydeden rota
+# Process the data from the form and save it in YAML file
 @app.post("/submit")
 async def submit_form(name: str = Form(...), url: str = Form(...), method: str = Form(...),
                       params: Optional[str] = Form(None)):
@@ -109,7 +109,7 @@ async def submit_form(name: str = Form(...), url: str = Form(...), method: str =
     return {"message": "API data saved successfully!"}
 
 
-# Health durumunu listeleyen rota
+# Health status list
 @app.get("/list")
 def list(request: Request, yaml_file="apis.yaml", output_yaml_file="api_health_results.yaml"):
     check_apis_health_periodically(yaml_file, output_yaml_file)
