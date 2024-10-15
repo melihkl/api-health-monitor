@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Form</title>
+    <style>
+        /* CSS kodları yukarıda */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            padding: 15px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error {
+            padding: 15px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>API Ekleme Formu</h2>
+
+        <div class="message" id="success-message">Başarıyla kaydedildi!</div>
+        <div class="error" id="error-message">Bir hata oluştu. Lütfen tekrar deneyin.</div>
+
+        <form id="api-form">
+            <label for="name">API Adı</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="url">API URL</label>
+            <input type="text" id="url" name="url" required>
+
+            <label for="method">Yöntem</label>
+            <select id="method" name="method" required>
+                <option value="" disabled selected>Yöntemi Seçin</option>
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+            </select>
+
+            <label for="params">Parametreler (JSON formatında)</label>
+            <textarea id="params" name="params"></textarea>
+
+            <button type="submit">Kaydet</button>
+        </form>
+
+        <!-- Listeleme Butonu -->
+        <button id="list-button">API Sağlık Durumlarını Listele</button>
+    </div>
+
+    <script>
+        document.getElementById('api-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Formun varsayılan davranışını durdurur
+
+            // Formdaki verileri al
+            const formData = new FormData(this);
+            const formObject = {};
+            formData.forEach((value, key) => formObject[key] = value);
+
+            try {
+                // API'ye POST isteği gönder
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formObject)
+                });
+
+                if (response.ok) {
+                    document.getElementById('success-message').style.display = 'block';
+                    document.getElementById('error-message').style.display = 'none';
+
+                    // Formu temizle
+                    this.reset();
+                } else {
+                    document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('success-message').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+            }
+        });
+
+        // Listeleme Butonu için Event Listener
+        document.getElementById('list-button').addEventListener('click', function() {
+            window.location.href = '/list'; // /list endpoint'ine yönlendirme
+        });
+    </script>
+</body>
+</html>

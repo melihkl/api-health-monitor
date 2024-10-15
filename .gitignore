@@ -1,0 +1,36 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Python virtual environments
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+
+# Local configuration files
+*.sqlite3
+*.db
+*.log
+
+# IDE specific files
+.idea/
+*.sublime-workspace
+*.sublime-project
+.vscode/
+
+# Pytest cache
+.cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+*.env
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*

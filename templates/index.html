@@ -1,0 +1,43 @@
+<html>
+<head>
+
+</head>
+<body>
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  table, th, td {
+    border: 1px solid black;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+</style>
+<table>
+  <tr>
+    <td>Api Name</td>
+    <td>Api Health</td>
+    <td>Status</td>
+  </tr>
+
+  <tr>
+    {% for api in apis_health %}
+    <td>{{api.name}}</td>
+    <td>{{api.health}}</td>
+    <td>{{api.status_code}}</td>
+  </tr>
+  {% endfor %}
+
+
+</table>
+</body>
+</html>

@@ -1,0 +1,16 @@
+apis_health:
+- health: UP
+  name: get
+  status_code: 200
+- health: UP
+  name: post
+  status_code: 201
+- health: UP
+  name: delete
+  status_code: 204
+- health: UP
+  name: put
+  status_code: 200
+- health: UP
+  name: yeni get
+  status_code: 200
