@@ -1,6 +1,5 @@
 import requests
 
-
 def check_health(api):
     method = api.get('method', 'GET').upper()  # Varsayılan GET
     url = api['url']

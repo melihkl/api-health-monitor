@@ -4,6 +4,7 @@ from fastapi import FastAPI, Form, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.staticfiles import StaticFiles
 
 from app import crud, services
 from app.db import Base, engine, get_db
@@ -13,6 +14,8 @@ templates = Jinja2Templates(directory="templates")
 
 # Veritabanı oluşturulması
 Base.metadata.create_all(bind=engine)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # Ana sayfa
