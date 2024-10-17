@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-pyyaml
 requests
 jinja2
 python-multipart
+sqlalchemy

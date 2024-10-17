@@ -1,117 +1,38 @@
-from fastapi import FastAPI, Form, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-import yaml
-import requests
 from typing import Optional
-import json
+
+from fastapi import FastAPI, Form, Request, Depends
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+
+from app import crud, services
+from app.db import Base, engine, get_db
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-
-# YAML reading and writing functions
-def read_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
+# Veritabanı oluşturulması
+Base.metadata.create_all(bind=engine)
 
 
-def write_to_yaml(file_path, data):
-    with open(file_path, 'w') as file:
-        yaml.dump(data, file)
-
-
-# Function that checks API health status
-def check_health(api):
-    method = api.get('method', 'GET').upper()
-    url = api['url']
-    params = api.get('params', {})
-    body = params.get('body', None)
-    query = params.get('query', None)
-
-    try:
-        if method == 'GET':
-            response = requests.get(url, params=query, verify=False)
-        elif method == 'POST':
-            response = requests.post(url, json=body, verify=False)
-        elif method == 'PUT':
-            response = requests.put(url, json=body, verify=False)
-        elif method == 'DELETE':
-            response = requests.delete(url, params=query, verify=False)
-        else:
-            return f"{api['name']} health: Unsupported method {method}"
-
-        if 200 <= response.status_code < 300:
-            return api['name'], response.status_code, "UP"
-        else:
-            return api['name'], response.status_code, "DOWN"
-
-    except requests.exceptions.RequestException as e:
-        return f"{api['name']} health: DOWN (Error: {str(e)})"
-
-
-# Function that checks API health status at regular intervals
-def check_apis_health_periodically(yaml_file, output_yaml):
-    apis = read_yaml(yaml_file)['apis']
-
-    results = {'apis_health': []}
-    for api in apis:
-        api_name, status_code, health_status = check_health(api)
-        results['apis_health'].append({
-            'name': api_name,
-            'status_code': status_code,
-            'health': health_status
-        })
-
-    write_to_yaml(output_yaml, results)
-
-
-# Function that saves the data received from the API form to the YAML file
-def save_to_yaml(api_data, file_path='apis.yaml'):
-    try:
-        with open(file_path, 'r') as file:
-            current_data = yaml.safe_load(file)
-    except FileNotFoundError:
-        current_data = {"apis": []}
-
-    current_data["apis"].append(api_data)
-
-    with open(file_path, 'w') as file:
-        yaml.safe_dump(current_data, file)
-
-
-# Show homepage form
+# Ana sayfa
 @app.get("/", response_class=HTMLResponse)
 async def form_view(request: Request):
     return templates.TemplateResponse("form.html", {"request": request})
 
 
-# Process the data from the form and save it in YAML file
+# API Ekleme
 @app.post("/submit")
 async def submit_form(name: str = Form(...), url: str = Form(...), method: str = Form(...),
-                      params: Optional[str] = Form(None)):
-    try:
-        params_dict = json.loads(params) if params else {}
-    except json.JSONDecodeError:
-        return {"error": "Invalid JSON format for params"}
-
-    api_data = {
-        "name": name,
-        "url": url,
-        "method": method,
-    }
-
-    if params_dict:
-        api_data["params"] = {"body": params_dict}
-
-    save_to_yaml(api_data)
-
+                      params: Optional[str] = Form(None), db: Session = Depends(get_db)):
+    api_data = {"name": name, "url": url, "method": method, "params": params}
+    crud.create_api(db=db, api_data=api_data)
     return {"message": "API data saved successfully!"}
 
 
-# Health status list
+# API Health Check Listeleme
 @app.get("/list")
-def list(request: Request, yaml_file="apis.yaml", output_yaml_file="api_health_results.yaml"):
-    check_apis_health_periodically(yaml_file, output_yaml_file)
-    yaml_data = read_yaml(output_yaml_file)
-    return templates.TemplateResponse("index.html", {"request": request, "apis_health": yaml_data['apis_health']})
+def list_apis(request: Request, db: Session = Depends(get_db)):
+    apis = crud.get_apis(db)
+    health_results = [services.check_health(api.__dict__) for api in apis]
+    return templates.TemplateResponse("index.html", {"request": request, "apis_health": health_results})
