@@ -27,8 +27,9 @@ async def form_view(request: Request):
 # API Ekleme
 @app.post("/submit")
 async def submit_form(name: str = Form(...), url: str = Form(...), method: str = Form(...),
-                      params: Optional[str] = Form(None), db: Session = Depends(get_db)):
-    api_data = {"name": name, "url": url, "method": method, "params": params}
+                      params: Optional[str] = Form(None),
+                      cookie: Optional[str] = Form(None), db: Session = Depends(get_db)):
+    api_data = {"name": name, "url": url, "method": method, "params": params, "cookie": cookie}
     crud.create_api(db=db, api_data=api_data)
     return {"message": "API data saved successfully!"}
 
