@@ -10,3 +10,4 @@ class API(Base):
     url = Column(String)
     method = Column(String)
     params = Column(String, nullable=True)
+    cookie = Column(String, nullable=True)
