@@ -3,18 +3,18 @@ import time
 
 import requests
 
+
 def check_health(api):
-    method = api.get('method', 'GET').upper()  # Varsayılan GET
+    method = api.get('method', 'GET').upper()
     url = api['url']
     cookie = api.get('cookie')
 
     params = api.get('params', {})
     if isinstance(params, str):
         try:
-            params= json.loads(params)
+            params = json.loads(params)
         except ValueError as e:
             return e
-
 
     body = params.get('body', None)
     query = params.get('query', None)
@@ -26,13 +26,13 @@ def check_health(api):
         cookies.append(f"{cookie}")
 
     if cookies:
-        headers['Cookie'] = cookies
+        headers['Cookie'] = '; '.join(cookies)
 
     headers['Content-Type'] = "application/json"
 
     if body:
         body_json = json.dumps(params)
-        headers['Content-Type'] = str(len(body_json))
+        headers['Content-Length'] = str(len(body_json))
 
     try:
         start_time = time.time()
