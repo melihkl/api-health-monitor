@@ -54,7 +54,7 @@
             rows="3"
           ></textarea>
         </div>
-         <div class="mb-3">
+        <div class="mb-3">
           <label for="cookie" class="form-label">Cookie</label>
           <input
             type="text"
@@ -73,15 +73,44 @@
       >
         API başarıyla kaydedildi!
       </div>
-
-      <button
-        onclick="window.location.href='/list'"
-        class="btn btn-secondary mt-3"
+      <div class="con mt-5">
+        <form
+          action="/fileSubmit/"
+          method="post"
+          id="fileFormId"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-3">
+            <input
+              class="form-control"
+              type="file"
+              id="formFile"
+              name="file"
+              accept=".json"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Dosya Yükle</button>
+        </form>
+      </div>
+      <div
+        id="file-success-message"
+        class="alert alert-success mt-3"
+        style="display: none"
       >
+        Başarı ile dosya yüklendi!
+      </div>
+    </div>
+    <div class="d-grid gap-2 col-3 mt-3 mx-auto">
+      <button onclick="window.location.href='/openList'" class="btn btn-success">
         Sağlık Durumunu Kontrol Et
       </button>
     </div>
-
+    <div class="d-grid gap-2 col-3 mt-3 mx-auto">
+      <button onclick="window.location.href='/list'" class="btn btn-success">
+        Listele
+      </button>
+    </div>
     <script src="../static/js/script.js"></script>
+    <script src="../static/js/fileScript.js"></script>
   </body>
 </html>

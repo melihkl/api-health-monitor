@@ -7,5 +7,5 @@ class APICreate(BaseModel):
     name: str
     url: str
     method: str
-    params : Optional[str] = None
-    cookie : Optional[str] = None
+    params: Optional[str] = None
+    cookie: Optional[str] = None

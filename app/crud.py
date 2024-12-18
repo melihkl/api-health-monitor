@@ -12,3 +12,8 @@ def create_api(db: Session, api_data: dict):
 
 def get_apis(db: Session):
     return db.query(models.API).all()
+
+
+def get_api_by_name(db: Session, api_name: str):
+    return db.query(models.API).filter(models.API.name == api_name).first()
+
